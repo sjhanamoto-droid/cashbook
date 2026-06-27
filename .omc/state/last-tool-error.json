@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd \\\"/Users/hanamotomasaki/公開サイト/現金経費管理アプリ\\\" && export PATH=\\\"/opt/homebrew/bin:$PATH\\\" && xcrun simctl terminate booted jp.sjdesign.cashbook 2>/dev/null; xcrun simctl shutdown booted 2>/d...",
+  "error": "Exit code 1\n(eval):1: no matches found: /tmp/redesign*.mjs",
+  "timestamp": "2026-06-26T15:03:02.250Z",
+  "retry_count": 1
+}

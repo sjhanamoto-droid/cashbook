@@ -1,0 +1,17 @@
+{
+  "name": "現金経費管理",
+  "short_name": "現金管理",
+  "description": "引き出した現金がどこへ消えたかを履歴で説明できる、現金版の通帳アプリ。",
+  "lang": "ja",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f2ec",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

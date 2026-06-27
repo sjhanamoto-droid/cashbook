@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f766e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="現金管理" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>現金経費管理</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ============ 入力（ホーム）画面 ============ -->
+    <section id="view-home" class="view is-active">
+      <header class="app-header center">
+        <h1 class="app-title">現金</h1>
+      </header>
+
+      <div class="scroll-area home-area">
+        <div class="balance-box">
+          <span class="balance-label">手元に残るはず（残金）</span>
+          <span class="balance-amount" id="home-balance">¥0</span>
+          <span class="balance-note" id="home-balance-note"></span>
+        </div>
+
+        <div class="big-btns">
+          <button class="big-btn withdraw" data-action="input-withdraw">
+            <svg viewBox="0 0 24 24" class="bb-ico"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span class="bb-label">おろした</span>
+            <span class="bb-sub">引き出し</span>
+          </button>
+          <button class="big-btn expense" data-action="input-expense">
+            <svg viewBox="0 0 24 24" class="bb-ico"><path d="M12 20V9m0 0 4.5 4.5M12 9l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 5h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span class="bb-label">使った</span>
+            <span class="bb-sub">使用</span>
+          </button>
+        </div>
+
+        <div class="recent-block">
+          <div class="block-head">
+            <h2>最近の記録</h2>
+            <button class="link-btn" data-nav="history">すべて見る ›</button>
+          </div>
+          <ul class="tx-list" id="recent-list"></ul>
+          <div class="empty-note" id="recent-empty" hidden>
+            まだ記録がありません。<br>上の「おろした／使った」から記録できます。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 分析画面 ============ -->
+    <section id="view-analysis" class="view">
+      <header class="app-header center">
+        <div class="month-switch">
+          <button class="month-arrow" data-action="ana-prev" aria-label="前の月">
+            <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="month-label" id="analysis-month">—</span>
+          <button class="month-arrow" data-action="ana-next" aria-label="次の月">
+            <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="scroll-area">
+        <div class="ana-summary-card" id="ana-summary"></div>
+
+        <div class="check-card" id="ana-check"></div>
+
+        <div class="chart-card">
+          <h2 class="chart-title">分類別の使用割合</h2>
+          <div class="donut-wrap" id="ana-donut"></div>
+        </div>
+
+        <div class="chart-card">
+          <h2 class="chart-title">月別の使用推移</h2>
+          <div class="bars-wrap" id="ana-bars"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 履歴画面 ============ -->
+    <section id="view-history" class="view">
+      <header class="app-header">
+        <button class="icon-btn" data-action="open-export" aria-label="書き出し">
+          <svg viewBox="0 0 24 24" class="ico"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="month-switch">
+          <button class="month-arrow" data-action="prev-month" aria-label="前の月">
+            <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="month-label" id="hist-month">—</span>
+          <button class="month-arrow" data-action="next-month" aria-label="次の月">
+            <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <span class="header-spacer"></span>
+      </header>
+
+      <div class="scroll-area">
+        <div class="ledger-card" id="hist-summary"></div>
+        <ul class="tx-list grouped" id="hist-list"></ul>
+        <div class="empty-note" id="hist-empty" hidden>この月の記録はありません。</div>
+      </div>
+    </section>
+
+    <!-- ============ 設定画面 ============ -->
+    <section id="view-settings" class="view">
+      <header class="app-header center">
+        <h1 class="app-title">設定</h1>
+      </header>
+      <div class="scroll-area">
+        <div class="setting-group">
+          <label class="field-label">分類ボタン</label>
+          <p class="setting-hint">使う分類を編集できます（5〜6個が目安）。</p>
+          <ul class="cat-edit-list" id="cat-edit-list"></ul>
+          <div class="cat-add">
+            <input type="text" id="cat-add-input" class="text-input" maxlength="8" placeholder="分類を追加" />
+            <button class="btn small" id="cat-add-btn">追加</button>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label class="field-label">利用開始時の手元現金</label>
+          <p class="setting-hint">アプリを使い始める前から財布にあった現金。最初の月の繰越になります。</p>
+          <div class="amount-display small">
+            <span class="yen">¥</span>
+            <input type="text" class="cc-amount" id="opening-input" inputmode="numeric" placeholder="0" />
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label class="field-label">データの書き出し・取り込み</label>
+          <p class="setting-hint">データはこの端末の中だけに保存されます。機種変更や万一に備え、ときどきバックアップしてください。</p>
+          <div class="setting-actions">
+            <button class="btn" id="backup-export">バックアップを保存</button>
+            <button class="btn" id="backup-import">バックアップを読み込む</button>
+            <input type="file" id="backup-file" accept="application/json,.json" hidden />
+          </div>
+          <div class="setting-actions">
+            <button class="btn" id="csv-all">全データCSV</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 下部ナビ（4タブ） ============ -->
+    <nav class="bottom-nav tabs4">
+      <button class="nav-btn is-active" data-nav="home">
+        <svg viewBox="0 0 24 24" class="nav-ico"><rect x="3" y="6" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>入力</span>
+      </button>
+      <button class="nav-btn" data-nav="analysis">
+        <svg viewBox="0 0 24 24" class="nav-ico"><path d="M12 3a9 9 0 1 0 9 9h-9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 3v9h9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" opacity=".5"/></svg>
+        <span>分析</span>
+      </button>
+      <button class="nav-btn" data-nav="history">
+        <svg viewBox="0 0 24 24" class="nav-ico"><path d="M6 4h12v16l-3-2-3 2-3-2-3 2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 9h6M9 13h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>履歴</span>
+      </button>
+      <button class="nav-btn" data-nav="settings">
+        <svg viewBox="0 0 24 24" class="nav-ico"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M19.4 13a7.8 7.8 0 0 0 .06-1 7.8 7.8 0 0 0-.06-1l2-1.6a.5.5 0 0 0 .12-.62l-1.9-3.3a.5.5 0 0 0-.6-.22l-2.4 1a7 7 0 0 0-1.7-1l-.36-2.5a.5.5 0 0 0-.5-.42h-3.8a.5.5 0 0 0-.5.42l-.36 2.5a7 7 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.22l-1.9 3.3a.5.5 0 0 0 .12.62l2 1.6a7.8 7.8 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.12.62l1.9 3.3a.5.5 0 0 0 .6.22l2.4-1a7 7 0 0 0 1.7 1l.36 2.5a.5.5 0 0 0 .5.42h3.8a.5.5 0 0 0 .5-.42l.36-2.5a7 7 0 0 0 1.7-1l2.4 1a.5.5 0 0 0 .6-.22l1.9-3.3a.5.5 0 0 0-.12-.62Z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+        <span>設定</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ============ 記録シート ============ -->
+  <div class="sheet" id="input-sheet" hidden>
+    <div class="sheet-backdrop" data-action="close-input"></div>
+    <form class="sheet-panel" id="input-form" autocomplete="off">
+      <div class="sheet-grip"></div>
+      <div class="sheet-head">
+        <button type="button" class="text-btn" data-action="close-input">キャンセル</button>
+        <span class="sheet-title" id="input-title">記録する</span>
+        <button type="submit" class="text-btn primary" id="save-btn">保存</button>
+      </div>
+
+      <div class="sheet-body">
+        <div class="segmented" id="type-seg">
+          <button type="button" class="seg-btn" data-type="withdraw">おろした</button>
+          <button type="button" class="seg-btn" data-type="expense">使った</button>
+          <span class="seg-thumb"></span>
+        </div>
+
+        <div class="amount-display">
+          <span class="yen">¥</span>
+          <span class="amount-value" id="amount-display">0</span>
+        </div>
+
+        <div class="field" id="category-field">
+          <label class="field-label">分類</label>
+          <div class="cat-grid" id="cat-grid"></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">一言メモ <span class="opt">任意</span></label>
+          <input type="text" class="text-input" id="memo-input" maxlength="40" placeholder="例：取引先と昼食" inputmode="text" />
+        </div>
+
+        <div class="field-row">
+          <div class="field field-date">
+            <label class="field-label">日付</label>
+            <input type="date" class="text-input" id="date-input" />
+          </div>
+          <div class="field field-photo" id="photo-field">
+            <label class="field-label">領収書 <span class="opt">任意</span></label>
+            <button type="button" class="photo-btn" id="photo-btn">
+              <svg viewBox="0 0 24 24" class="ico"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2L8 5h8l1.5 2h2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="13" r="3.2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span id="photo-btn-label">撮影 / 選択</span>
+            </button>
+            <input type="file" id="photo-input" accept="image/*" hidden />
+            <div class="photo-preview" id="photo-preview" hidden>
+              <img id="photo-thumb" alt="領収書プレビュー" />
+              <button type="button" class="photo-remove" id="photo-remove" aria-label="写真を削除">×</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="keypad" id="keypad">
+        <button type="button" class="key" data-key="1">1</button>
+        <button type="button" class="key" data-key="2">2</button>
+        <button type="button" class="key" data-key="3">3</button>
+        <button type="button" class="key" data-key="4">4</button>
+        <button type="button" class="key" data-key="5">5</button>
+        <button type="button" class="key" data-key="6">6</button>
+        <button type="button" class="key" data-key="7">7</button>
+        <button type="button" class="key" data-key="8">8</button>
+        <button type="button" class="key" data-key="9">9</button>
+        <button type="button" class="key key-sub" data-key="000">000</button>
+        <button type="button" class="key" data-key="0">0</button>
+        <button type="button" class="key key-sub" data-key="back" aria-label="削除">⌫</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ============ 明細モーダル ============ -->
+  <div class="modal" id="detail-modal" hidden>
+    <div class="modal-backdrop" data-action="close-detail"></div>
+    <div class="modal-panel" id="detail-panel"></div>
+  </div>
+
+  <!-- ============ 実額照合モーダル ============ -->
+  <div class="modal" id="cashcount-modal" hidden>
+    <div class="modal-backdrop" data-action="close-cashcount"></div>
+    <div class="modal-panel">
+      <h3 class="modal-title">手元現金の照合</h3>
+      <p class="modal-desc" id="cc-desc"></p>
+      <div class="cc-row">
+        <span>帳簿上 手元に残るはず</span>
+        <strong id="cc-book">¥0</strong>
+      </div>
+      <label class="field-label">実際に財布にある現金</label>
+      <div class="amount-display small">
+        <span class="yen">¥</span>
+        <input type="text" class="cc-amount" id="cc-input" inputmode="numeric" placeholder="0" />
+      </div>
+      <div class="cc-result" id="cc-result"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" data-action="close-cashcount">閉じる</button>
+        <button class="btn primary" id="cc-save">記録する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 写真ビューア ============ -->
+  <div class="photo-viewer" id="photo-viewer" hidden>
+    <button class="pv-close" data-action="close-viewer" aria-label="閉じる">×</button>
+    <img id="pv-image" alt="領収書" />
+  </div>
+
+  <!-- ============ 書き出しメニュー ============ -->
+  <div class="modal" id="export-modal" hidden>
+    <div class="modal-backdrop" data-action="close-export"></div>
+    <div class="modal-panel">
+      <h3 class="modal-title" id="export-title">この月を書き出す</h3>
+      <p class="setting-hint">税理士への共有や保管に使えます。</p>
+      <div class="modal-actions col">
+        <button class="btn" id="export-csv">CSVで書き出す</button>
+        <button class="btn" id="export-print">印刷 / PDFで保存</button>
+        <button class="btn ghost" data-action="close-export">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- トースト -->
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="js/db.js"></script>
+  <script src="js/capacitor-plugins.js"></script>
+  <script src="js/native.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

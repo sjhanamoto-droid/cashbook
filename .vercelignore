@@ -1,0 +1,10 @@
+# Vercelには静的サイト（www/）だけをアップロードする
+node_modules
+ios
+resources
+native-src
+package.json
+package-lock.json
+*.md
+*.log
+現金経費管理アプリ_仕様メモ.md

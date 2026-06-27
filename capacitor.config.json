@@ -1,0 +1,10 @@
+{
+  "appId": "jp.sjdesign.cashbook",
+  "appName": "Cashbook",
+  "webDir": "www",
+  "backgroundColor": "#f4f2ec",
+  "ios": {
+    "backgroundColor": "#f4f2ec",
+    "contentInset": "never"
+  }
+}

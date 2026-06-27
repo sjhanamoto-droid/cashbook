@@ -1,0 +1,18 @@
+# 依存・ビルド生成物（必要なら npm install / npx cap sync ios で再生成）
+node_modules/
+ios/build/
+ios/App/build/
+ios/App/DerivedData/
+**/DerivedData/
+ios/App/Pods/
+ios/App/CapApp-SPM/.build/
+ios/App/App/public/
+
+# macOS / Xcode
+.DS_Store
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# バックアップ書き出しの一時ファイル等
+*.log

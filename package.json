@@ -1,0 +1,24 @@
+{
+  "name": "cashbook-ios",
+  "version": "1.0.0",
+  "private": true,
+  "description": "現金経費管理 — 現金版の通帳アプリ（iOSアプリ版）",
+  "scripts": {
+    "sync": "cap sync ios",
+    "open": "cap open ios",
+    "icons": "capacitor-assets generate --ios",
+    "build:native": "esbuild native-src/capacitor-entry.js --bundle --format=iife --outfile=www/js/capacitor-plugins.js --minify",
+    "build:sim": "xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build CODE_SIGNING_ALLOWED=NO build"
+  },
+  "dependencies": {
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/ios": "^8.4.1",
+    "@capacitor/share": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}
