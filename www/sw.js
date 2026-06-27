@@ -1,7 +1,7 @@
 /* sw.js — オフライン対応サービスワーカー
    アプリ本体（殻）をキャッシュし、ネットがなくても開けるようにする。
    データ本体は IndexedDB（端末内）にあり、ここでは扱わない。 */
-const CACHE = 'cashbook-v2';
+const CACHE = 'cashbook-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -30,6 +30,11 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  // 同一オリジンの http(s) のみ対象。blob:/data:/chrome-extension: などは横取りしない
+  // （領収書プレビューの blob: 画像が壊れるのを防ぐ）
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
   e.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;

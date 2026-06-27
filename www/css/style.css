@@ -278,6 +278,7 @@ input { font-family: inherit; }
 }
 .photo-btn .ico { width: 20px; height: 20px; }
 .photo-preview { position: relative; display: inline-block; margin-top: 10px; }
+.photo-preview[hidden] { display: none; }
 .photo-preview img { display: block; height: 120px; width: auto; max-width: 100%; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
 .photo-remove {
   position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; border-radius: 50%;

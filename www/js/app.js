@@ -369,13 +369,17 @@
     const wrap = $('#photo-preview');
     const img = $('#photo-thumb');
     const label = $('#photo-btn-label');
+    if (img.dataset.url) { URL.revokeObjectURL(img.dataset.url); delete img.dataset.url; }
     if (state.input.photoBlob) {
-      if (img.dataset.url) URL.revokeObjectURL(img.dataset.url);
       const url = URL.createObjectURL(state.input.photoBlob);
-      img.src = url; img.dataset.url = url;
+      img.dataset.url = url;
+      img.onerror = () => { wrap.hidden = true; };  // 読み込み失敗時は枠ごと隠す
+      img.src = url;
       wrap.hidden = false;
       label.textContent = '撮り直す';
     } else {
+      img.onerror = null;
+      img.removeAttribute('src');                   // 画像が無いときは src を外す（壊れた画像を出さない）
       wrap.hidden = true;
       label.textContent = '撮影 / 選択';
     }
