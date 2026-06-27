@@ -16,3 +16,4 @@ xcuserdata/
 
 # バックアップ書き出しの一時ファイル等
 *.log
+.vercel
