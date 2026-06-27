@@ -181,7 +181,7 @@
       <div class="sheet-head">
         <button type="button" class="text-btn" data-action="close-input">キャンセル</button>
         <span class="sheet-title" id="input-title">記録する</span>
-        <button type="submit" class="text-btn primary" id="save-btn">保存</button>
+        <span class="head-spacer" aria-hidden="true"></span>
       </div>
 
       <div class="sheet-body">
@@ -238,6 +238,13 @@
         <button type="button" class="key key-sub" data-key="000">000</button>
         <button type="button" class="key" data-key="0">0</button>
         <button type="button" class="key key-sub" data-key="back" aria-label="削除">⌫</button>
+      </div>
+
+      <div class="save-bar">
+        <button type="submit" class="save-big" id="save-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="save-label">保存する</span>
+        </button>
       </div>
     </form>
   </div>
