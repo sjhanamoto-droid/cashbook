@@ -144,6 +144,9 @@ input { font-family: inherit; }
 .tx-type-tag { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
 .tx-type-tag.in { background: var(--in-soft); color: var(--in); }
 .tx-type-tag.out { background: var(--out-soft); color: var(--out); }
+.tx-purpose { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; white-space: nowrap; }
+.tx-purpose.business { background: var(--teal-soft); color: var(--teal-dark); }
+.tx-purpose.personal { background: #fbe9d4; color: #b45309; }
 .tx-memo { font-size: 12.5px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
 .tx-date { font-size: 11.5px; color: var(--ink-faint); margin-top: 2px; }
 .tx-right { display: flex; align-items: center; gap: 8px; flex: none; }
@@ -240,6 +243,11 @@ input { font-family: inherit; }
   box-shadow: 0 2px 6px rgba(0,0,0,.12);
 }
 .segmented[data-type="expense"] .seg-thumb { transform: translateX(100%); background: var(--out); }
+
+/* 用途（事業用/個人用）— フィールド内なので下余白を詰める */
+#purpose-field .segmented { margin-bottom: 0; }
+.purpose-seg .seg-thumb { background: var(--teal); }
+.purpose-seg[data-purpose="personal"] .seg-thumb { transform: translateX(100%); background: #b45309; }
 
 .amount-display {
   display: flex; align-items: baseline; justify-content: flex-end; gap: 4px;
@@ -455,6 +463,8 @@ input { font-family: inherit; }
 .ana-row.in .av { color: var(--in); }
 .ana-row.out .av { color: var(--out); }
 .ana-row.total .av { font-size: 18px; color: var(--teal-dark); }
+.ana-row.sub { padding: 2px 0 6px; font-size: 12.5px; color: #b45309; }
+.ana-row.sub .av { font-weight: 700; color: #b45309; }
 .ana-rule { height: 1px; background: var(--line-strong); margin: 8px 0; }
 
 .chart-card {

@@ -170,9 +170,17 @@
     const c = computeMonth(m);
     $('#analysis-month').textContent = monthLabel(m);
 
+    let personal = 0;
+    for (const t of state.allTx) {
+      if (t.month === m && t.type === 'expense' && t.purpose === 'personal') personal += t.amount;
+    }
     let sum = `
       <div class="ana-row in"><span>引き出し合計</span><span class="av">${yen(c.withdraw)}</span></div>
-      <div class="ana-row out"><span>使用合計</span><span class="av">${yen(c.expense)}</span></div>
+      <div class="ana-row out"><span>使用合計</span><span class="av">${yen(c.expense)}</span></div>`;
+    if (personal > 0) {
+      sum += `<div class="ana-row sub"><span>　うち個人用</span><span class="av">${yen(personal)}</span></div>`;
+    }
+    sum += `
       <div class="ana-rule"></div>
       <div class="ana-row total"><span>手元に残るはず</span><span class="av">${yen(c.remain)}</span></div>`;
     if (c.cashcount) {
@@ -269,13 +277,16 @@
     li.dataset.id = t.id;
     const io = t.type === 'withdraw' ? 'in' : 'out';
     const label = t.type === 'withdraw' ? '現金引き出し' : (t.category || 'その他');
+    const tagHtml = t.type === 'withdraw'
+      ? '<span class="tx-type-tag in">引き出し</span>'
+      : `<span class="tx-purpose ${t.purpose === 'personal' ? 'personal' : 'business'}">${t.purpose === 'personal' ? '個人' : '事業'}</span>`;
     const photoIco = t.photo ? `<svg viewBox="0 0 24 24" class="tx-photo-ico"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2L8 5h8l1.5 2h2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>` : '';
     li.innerHTML = `
       <span class="tx-mark ${io}"></span>
       <div class="tx-main">
         <div class="tx-top">
           <span class="tx-cat">${escapeHtml(label)}</span>
-          <span class="tx-type-tag ${io}">${t.type === 'withdraw' ? '引き出し' : '使用'}</span>
+          ${tagHtml}
         </div>
         ${t.memo ? `<div class="tx-memo">${escapeHtml(t.memo)}</div>` : ''}
         ${showDate ? `<div class="tx-date">${dateLabel(t.date)}</div>` : ''}
@@ -306,6 +317,7 @@
       type: cur.type,
       amountStr: cur.amount ? String(cur.amount) : '',
       category: cur.category || '',
+      purpose: cur.purpose || 'business',   // 用途：事業用 / 個人用
       memo: cur.memo || '',
       date: cur.date,
       photoBlob: cur.photo || null,
@@ -313,6 +325,7 @@
     };
     $('#input-title').textContent = editTx ? '記録を編集' : '記録する';
     syncTypeUI();
+    syncPurposeUI();
     renderCatGrid();
     $('#memo-input').value = state.input.memo;
     $('#date-input').value = state.input.date;
@@ -327,8 +340,16 @@
     $$('#type-seg .seg-btn').forEach((b) =>
       b.classList.toggle('is-active', b.dataset.type === t));
     const isExpense = t === 'expense';
+    $('#purpose-field').style.display = isExpense ? '' : 'none';
     $('#category-field').style.display = isExpense ? '' : 'none';
     $('#photo-field').style.display = isExpense ? '' : 'none';
+  }
+
+  function syncPurposeUI() {
+    const pp = state.input.purpose || 'business';
+    $('#purpose-seg').dataset.purpose = pp;
+    $$('#purpose-seg .seg-btn').forEach((b) =>
+      b.classList.toggle('is-active', b.dataset.purpose === pp));
   }
 
   function renderCatGrid() {
@@ -431,6 +452,7 @@
       month: monthOf(inp.date),
       amount,
       category: inp.type === 'expense' ? inp.category : '',
+      purpose: inp.type === 'expense' ? (inp.purpose || 'business') : '',
       memo: $('#memo-input').value.trim(),
       photo: inp.type === 'expense' ? inp.photoBlob : null,
       createdAt: inp.id ? (await DB.getTransaction(inp.id))?.createdAt || Date.now() : Date.now(),
@@ -459,6 +481,7 @@
       <div class="detail-amount ${io}">${signedYen(t)}</div>
       <div class="detail-meta">${t.type === 'withdraw' ? '現金引き出し' : '使用'}・${dateLabel(t.date)}</div>
       ${photoHtml}
+      ${t.type === 'expense' ? `<div class="detail-field"><span class="df-label">用途</span><span class="df-val">${t.purpose === 'personal' ? '個人用' : '事業用'}</span></div>` : ''}
       ${t.type === 'expense' ? `<div class="detail-field"><span class="df-label">分類</span><span class="df-val">${escapeHtml(t.category || 'その他')}</span></div>` : ''}
       ${t.memo ? `<div class="detail-field"><span class="df-label">メモ</span><span class="df-val">${escapeHtml(t.memo)}</span></div>` : ''}
       <div class="modal-actions">
@@ -598,12 +621,13 @@
       t.date,
       t.type === 'withdraw' ? '引き出し' : '使用',
       t.amount,
+      t.type === 'withdraw' ? '' : (t.purpose === 'personal' ? '個人用' : '事業用'),
       t.type === 'withdraw' ? '' : (t.category || 'その他'),
       (t.memo || '').replace(/\r?\n/g, ' '),
     ]);
   }
   function buildCSV(list, title) {
-    const header = ['日付', '種別', '金額', '分類', 'メモ'];
+    const header = ['日付', '種別', '金額', '用途', '分類', 'メモ'];
     const rows = txToRows(list);
     const esc = (v) => {
       const s = String(v);
@@ -649,6 +673,7 @@
       <tr>
         <td>${dateLabel(t.date)}</td>
         <td class="c">${t.type === 'withdraw' ? '引き出し' : '使用'}</td>
+        <td class="c">${t.type === 'withdraw' ? '—' : (t.purpose === 'personal' ? '個人' : '事業')}</td>
         <td>${t.type === 'withdraw' ? '—' : escapeHtml(t.category || 'その他')}</td>
         <td>${escapeHtml(t.memo || '')}</td>
         <td class="r ${t.type === 'withdraw' ? 'pin' : 'pout'}">${signedYen(t)}</td>
@@ -686,8 +711,8 @@
         <tr><th>翌月へ繰越</th><td class="r">${yen(c.remain)}</td></tr>
       </table>
       <table class="ledger">
-        <thead><tr><th>日付</th><th>種別</th><th>分類</th><th>メモ</th><th class="r">金額</th></tr></thead>
-        <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:#999;padding:24px">記録なし</td></tr>'}</tbody>
+        <thead><tr><th>日付</th><th>種別</th><th>用途</th><th>分類</th><th>メモ</th><th class="r">金額</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#999;padding:24px">記録なし</td></tr>'}</tbody>
       </table>
       </body></html>`;
     if (window.CashbookNative && window.CashbookNative.isNative) {
@@ -851,6 +876,12 @@
     $$('#type-seg .seg-btn').forEach((b) => b.addEventListener('click', () => {
       state.input.type = b.dataset.type;
       syncTypeUI();
+    }));
+
+    // 用途切替（事業用 / 個人用）
+    $$('#purpose-seg .seg-btn').forEach((b) => b.addEventListener('click', () => {
+      state.input.purpose = b.dataset.purpose;
+      syncPurposeUI();
     }));
 
     // テンキー
