@@ -3,7 +3,7 @@
   "short_name": "現金管理",
   "description": "引き出した現金がどこへ消えたかを履歴で説明できる、現金版の通帳アプリ。",
   "lang": "ja",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

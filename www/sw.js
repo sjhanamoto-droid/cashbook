@@ -1,7 +1,7 @@
 /* sw.js — オフライン対応サービスワーカー
    アプリ本体（殻）をキャッシュし、ネットがなくても開けるようにする。
    データ本体は IndexedDB（端末内）にあり、ここでは扱わない。 */
-const CACHE = 'cashbook-v3';
+const CACHE = 'cashbook-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -35,11 +35,25 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+
+  // ページ遷移（ナビゲーション）はキャッシュ済みの index.html を返す。
+  // リダイレクト付きレスポンスを返すと iOS のホーム画面アプリで
+  // "Response served by service worker has redirections" になり開けなくなるため、
+  // ここでリダイレクトを挟まないクリーンな 200 を返す。
+  if (req.mode === 'navigate') {
+    e.respondWith(
+      caches.match('./index.html').then((cached) => cached || fetch('./index.html'))
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
   e.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
       return fetch(req).then((res) => {
-        if (res && res.status === 200 && res.type === 'basic') {
+        // リダイレクトされたレスポンスはキャッシュしない（再生時に同エラーを防ぐ）
+        if (res && res.ok && !res.redirected && res.type === 'basic') {
           const clone = res.clone();
           caches.open(CACHE).then((c) => c.put(req, clone));
         }
