@@ -331,6 +331,7 @@
     $('#date-input').value = state.input.date;
     updateAmountDisplay();
     updatePhotoPreview();
+    $('#input-form').classList.remove('keypad-open');   // テンキーは閉じた状態で開く
     showSheet('#input-sheet');
   }
 
@@ -884,7 +885,15 @@
       syncPurposeUI();
     }));
 
-    // テンキー
+    // テンキー：金額をタップした時だけ表示し、他の操作で閉じる
+    $('#input-form').addEventListener('click', (e) => {
+      if (e.target.closest('#amount-tap')) {            // 金額タップ → 表示
+        $('#input-form').classList.add('keypad-open');
+        return;
+      }
+      if (e.target.closest('#keypad')) return;          // キー操作中は開いたまま
+      $('#input-form').classList.remove('keypad-open'); // それ以外の操作 → 閉じる
+    });
     $('#keypad').addEventListener('click', (e) => {
       const k = e.target.closest('.key');
       if (k) keypadPress(k.dataset.key);
